@@ -3,17 +3,19 @@ import { useHistory, useParams } from "react-router";
 import { db } from "../../firebase";
 import useRoom from "../../hooks/useRoom";
 import { BoardCover, Game, Row, Reset, Container } from "../../styles";
+import { useStateValue } from "../../StateProvider";
 const Board = () => {
   const { id } = useParams();
   const { processing, room } = useRoom(id);
+  const [{ user }] = useStateValue();
   const history = useHistory();
   const [loading, setLoading] = useState(false);
-
   if (processing) return <h1>Loading Room...</h1>;
   if (!room) return <h1>Room Not Found..</h1>;
   if (loading) return <h1>Resetting the Game...</h1>;
-  const { board, gameDone, message, turnCount, playerTurn } = room;
 
+  const { board, gameDone, message, turnCount, playerTurn, players } = room;
+  // if (players.length === 1) return <h1>Waiting for other player to join</h1>;
   const sendBoard = async (id, newRoom) => {
     await db.collection("rooms").doc(id).set(newRoom);
   };
@@ -25,7 +27,6 @@ const Board = () => {
       newMessage = null,
       newPlayerTurn = playerTurn === "X" ? "O" : "X";
     if (!board[index] && !gameDone) {
-      // setBoard(newBoard);
       if (turnCount >= 4) {
         if (playerTurn === "X") {
           if (
@@ -66,7 +67,7 @@ const Board = () => {
             newGameDone = true;
           }
         }
-        if (turnCount === 9) {
+        if (turnCount === 8) {
           newMessage = "Draw";
           newGameDone = true;
         }
@@ -79,6 +80,7 @@ const Board = () => {
         turnCount: newTurnCount,
         gameDone: newGameDone,
         playerTurn: newPlayerTurn,
+        players: players,
       };
       sendBoard(id, newRoom);
     }
@@ -94,32 +96,84 @@ const Board = () => {
         gameDone: false,
         playerTurn: playerTurn === "X" ? "O" : "X",
         turnCount: 0,
+        players: players,
       })
       .then(() => setLoading(false));
   };
+  const handleExit = async (id) => {
+    const newPlayers = players.filter((p) => p !== user.id);
+    if (newPlayers.length > 0) {
+      await db
+        .collection("rooms")
+        .doc(id)
+        .update({
+          players: newPlayers,
+        })
+        .then(() => {
+          history.push("/");
+        });
+    } else {
+      await db
+        .collection("rooms")
+        .doc(id)
+        .delete()
+        .then(() => {
+          history.push("/");
+        });
+    }
+  };
   return (
     <BoardCover>
-      <h1>Tic-Tac-Toe Room {id}</h1>
-      <h3>{message ? message : `Player Turn - ${playerTurn}`}</h3>
-      <Game>
-        <Row>
-          <Container onClick={() => setSquare(0)}>{board[0]}</Container>
-          <Container onClick={() => setSquare(1)}>{board[1]}</Container>
-          <Container onClick={() => setSquare(2)}>{board[2]}</Container>
-        </Row>
-        <Row>
-          <Container onClick={() => setSquare(3)}>{board[3]}</Container>
-          <Container onClick={() => setSquare(4)}>{board[4]}</Container>
-          <Container onClick={() => setSquare(5)}>{board[5]}</Container>
-        </Row>
-        <Row>
-          <Container onClick={() => setSquare(6)}>{board[6]}</Container>
-          <Container onClick={() => setSquare(7)}>{board[7]}</Container>
-          <Container onClick={() => setSquare(8)}>{board[8]}</Container>
-        </Row>
-      </Game>
-      <Reset onClick={() => handleReset(id)}>Reset</Reset>
-      <Reset onClick={() => history.push("/")}>Exit</Reset>
+      {players.length < 2 ? (
+        <h1>Looking for players...</h1>
+      ) : (
+        <>
+          <h1>Tic-Tac-Toe Room {id}</h1>
+          <h3>{message ? message : `Player Turn - ${playerTurn}`}</h3>
+          {(playerTurn === "X" && !(user.id === players[0]) && !gameDone) ||
+          (playerTurn === "O" && user.id === players[0] && !gameDone) ? (
+            <h1
+              style={{
+                position: "absolute",
+                zIndex: 101,
+                marginTop: "-30px",
+                color: "white",
+                backgroundColor: "black",
+                opacity: 0.5,
+                height: "65vh",
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              Waiting for other player's turn
+            </h1>
+          ) : (
+            ""
+          )}
+          <Game>
+            <Row>
+              <Container onClick={() => setSquare(0)}>{board[0]}</Container>
+              <Container onClick={() => setSquare(1)}>{board[1]}</Container>
+              <Container onClick={() => setSquare(2)}>{board[2]}</Container>
+            </Row>
+            <Row>
+              <Container onClick={() => setSquare(3)}>{board[3]}</Container>
+              <Container onClick={() => setSquare(4)}>{board[4]}</Container>
+              <Container onClick={() => setSquare(5)}>{board[5]}</Container>
+            </Row>
+            <Row>
+              <Container onClick={() => setSquare(6)}>{board[6]}</Container>
+              <Container onClick={() => setSquare(7)}>{board[7]}</Container>
+              <Container onClick={() => setSquare(8)}>{board[8]}</Container>
+            </Row>
+          </Game>
+        </>
+      )}
+
+      {gameDone && <Reset onClick={() => handleReset(id)}>Reset</Reset>}
+      <Reset onClick={() => handleExit(id)}>Exit</Reset>
     </BoardCover>
   );
 };

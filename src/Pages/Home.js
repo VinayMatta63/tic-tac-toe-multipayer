@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router";
-import { db } from "../firebase";
+import { auth, db } from "../firebase";
+import { useStateValue } from "../StateProvider";
 
 const Home = () => {
   const history = useHistory();
   const [loading, setLoading] = useState(false);
+  const [{ user }, dispatch] = useStateValue();
   let room = null;
   const findRoom = async () => {
     setLoading(true);
@@ -18,7 +20,7 @@ const Home = () => {
       await db
         .collection("rooms")
         .doc(room.id)
-        .update({ players: [...room.data().players, "Matta"] })
+        .update({ players: [...room.data().players, user.id] })
         .then(() => {
           history.push(`/room/${room.id}`);
           setLoading(false);
@@ -32,7 +34,7 @@ const Home = () => {
           gameDone: false,
           playerTurn: "X",
           turnCount: 0,
-          players: ["Vinay"],
+          players: [user.id],
         })
         .then((doc) => {
           history.push(`/room/${doc.id}`);
@@ -40,11 +42,20 @@ const Home = () => {
         });
     }
   };
+  const logoutHandler = () => {
+    if (user) {
+      auth.signOut();
+      dispatch({
+        type: "REMOVE_USER",
+      });
+    }
+  };
   if (loading) return <h1>Finding Room..</h1>;
   return (
     <div>
       <h1>Home</h1>
       <button onClick={findRoom}>Game Room</button>
+      <button onClick={logoutHandler}>Log Out</button>
     </div>
   );
 };
