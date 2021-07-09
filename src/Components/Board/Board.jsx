@@ -15,7 +15,6 @@ const Board = () => {
   if (loading) return <h1>Resetting the Game...</h1>;
 
   const { board, gameDone, message, turnCount, playerTurn, players } = room;
-  // if (players.length === 1) return <h1>Waiting for other player to join</h1>;
   const sendBoard = async (id, newRoom) => {
     await db.collection("rooms").doc(id).set(newRoom);
   };
