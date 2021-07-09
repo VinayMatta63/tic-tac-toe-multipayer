@@ -1,22 +1,33 @@
 import React, { useState } from "react";
 import { useHistory, useParams } from "react-router";
-import { BoardCover, Game, Row, Reset, Container } from "../styles";
+import { db } from "../../firebase";
+import useRoom from "../../hooks/useRoom";
+import { BoardCover, Game, Row, Reset, Container } from "../../styles";
 const Board = () => {
   const { id } = useParams();
+  const { processing, room } = useRoom(id);
   const history = useHistory();
-  const [isX, setIsX] = useState(true);
-  const [board, setBoard] = useState(["", "", "", "", "", "", "", "", ""]);
-  const [turnCount, setTurnCount] = useState(0);
-  const [message, setMessage] = useState(null);
-  const [gameDone, setGameDone] = useState(false);
+  const [loading, setLoading] = useState(false);
 
+  if (processing) return <h1>Loading Room...</h1>;
+  if (!room) return <h1>Room Not Found..</h1>;
+  if (loading) return <h1>Resetting the Game...</h1>;
+  const { board, gameDone, message, turnCount, playerTurn } = room;
+
+  const sendBoard = async (id, newRoom) => {
+    await db.collection("rooms").doc(id).set(newRoom);
+  };
   const setSquare = (index) => {
+    const newBoard = [...board];
+    newBoard[index] = playerTurn;
+    let newTurnCount,
+      newGameDone = false,
+      newMessage = null,
+      newPlayerTurn = playerTurn === "X" ? "O" : "X";
     if (!board[index] && !gameDone) {
-      const newBoard = [...board];
-      newBoard[index] = isX ? "X" : "O";
-      setBoard(newBoard);
+      // setBoard(newBoard);
       if (turnCount >= 4) {
-        if (isX) {
+        if (playerTurn === "X") {
           if (
             (newBoard[0] === "X" &&
               newBoard[1] === "X" &&
@@ -32,11 +43,10 @@ const Board = () => {
               newBoard[8] === "X") ||
             (newBoard[6] === "X" && newBoard[4] === "X" && newBoard[2] === "X")
           ) {
-            setMessage("X Wins!!");
-            setGameDone(true);
+            newMessage = "X Wins!!";
+            newGameDone = true;
           }
-        }
-        if (!isX) {
+        } else {
           if (
             (newBoard[0] === "O" &&
               newBoard[1] === "O" &&
@@ -52,37 +62,45 @@ const Board = () => {
               newBoard[8] === "O") ||
             (newBoard[6] === "O" && newBoard[4] === "O" && newBoard[2] === "O")
           ) {
-            setMessage("O Wins !!");
-            setGameDone(true);
+            newMessage = "O Wins !!";
+            newGameDone = true;
           }
         }
         if (turnCount === 9) {
-          setMessage("Draw");
-          setGameDone(true);
+          newMessage = "Draw";
+          newGameDone = true;
         }
       }
-      setIsX(!isX);
-      setTurnCount(turnCount + 1);
+      // setIsX(!isX);
+      newTurnCount = turnCount + 1;
+      const newRoom = {
+        board: newBoard,
+        message: newMessage,
+        turnCount: newTurnCount,
+        gameDone: newGameDone,
+        playerTurn: newPlayerTurn,
+      };
+      sendBoard(id, newRoom);
     }
-    // fetch("http://localhost:4000", {
-    //   headers: {
-    //     "Content-Type": "application/json;charset=utf-8",
-    //   },
-    // })
-    //   .then((res) => res.json())
-    //   .then((res) => console.log(res));
   };
-  const handleReset = () => {
-    setBoard(["", "", "", "", "", "", "", "", ""]);
-    setIsX(true);
-    setGameDone(false);
-    setTurnCount(0);
-    setMessage(null);
+  const handleReset = async (id) => {
+    setLoading(true);
+    await db
+      .collection("rooms")
+      .doc(id)
+      .set({
+        board: ["", "", "", "", "", "", "", "", ""],
+        message: null,
+        gameDone: false,
+        playerTurn: playerTurn === "X" ? "O" : "X",
+        turnCount: 0,
+      })
+      .then(() => setLoading(false));
   };
   return (
     <BoardCover>
       <h1>Tic-Tac-Toe Room {id}</h1>
-      <h3>{message ? message : `Player Turn - ${isX ? "X" : "O"}`}</h3>
+      <h3>{message ? message : `Player Turn - ${playerTurn}`}</h3>
       <Game>
         <Row>
           <Container onClick={() => setSquare(0)}>{board[0]}</Container>
@@ -100,7 +118,7 @@ const Board = () => {
           <Container onClick={() => setSquare(8)}>{board[8]}</Container>
         </Row>
       </Game>
-      <Reset onClick={handleReset}>Reset</Reset>
+      <Reset onClick={() => handleReset(id)}>Reset</Reset>
       <Reset onClick={() => history.push("/")}>Exit</Reset>
     </BoardCover>
   );

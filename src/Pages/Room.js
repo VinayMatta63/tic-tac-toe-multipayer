@@ -1,5 +1,5 @@
 import React from "react";
-import Board from "../Board/Board";
+import Board from "../Components/Board/Board";
 
 const Room = () => {
   return <Board />;
