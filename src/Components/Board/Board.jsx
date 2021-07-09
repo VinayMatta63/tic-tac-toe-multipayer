@@ -14,7 +14,15 @@ const Board = () => {
   if (!room) return <h1>Room Not Found..</h1>;
   if (loading) return <h1>Resetting the Game...</h1>;
 
-  const { board, gameDone, message, turnCount, playerTurn, players } = room;
+  const {
+    board,
+    gameDone,
+    message,
+    turnCount,
+    playerTurn,
+    players,
+    isPrivate,
+  } = room;
   const sendBoard = async (id, newRoom) => {
     await db.collection("rooms").doc(id).set(newRoom);
   };
@@ -71,7 +79,6 @@ const Board = () => {
           newGameDone = true;
         }
       }
-      // setIsX(!isX);
       newTurnCount = turnCount + 1;
       const newRoom = {
         board: newBoard,
@@ -124,7 +131,11 @@ const Board = () => {
   return (
     <BoardCover>
       {players.length < 2 ? (
-        <h1>Looking for players...</h1>
+        <h1>
+          {isPrivate
+            ? `Ask your friend to join using this id.. ${id}`
+            : "Looking for players... "}
+        </h1>
       ) : (
         <>
           <h1>Tic-Tac-Toe Room {id}</h1>
