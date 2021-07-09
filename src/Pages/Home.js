@@ -3,6 +3,14 @@ import { useHistory } from "react-router";
 import { auth, db } from "../firebase";
 import { useStateValue } from "../StateProvider";
 import Modal from "@material-ui/core/Modal";
+import {
+  HomeContainer,
+  HomeButtons,
+  Cover,
+  HomeBox,
+  HomeHead,
+  HomeButton,
+} from "../styles";
 
 const Home = () => {
   const history = useHistory();
@@ -59,6 +67,7 @@ const Home = () => {
         });
     }
   };
+
   const logoutHandler = () => {
     if (user) {
       auth.signOut();
@@ -67,6 +76,7 @@ const Home = () => {
       });
     }
   };
+
   const createPrivateRoom = async () => {
     await db
       .collection("rooms")
@@ -84,6 +94,7 @@ const Home = () => {
         setLoading(false);
       });
   };
+
   const findPrivateRoom = async (e) => {
     e.preventDefault();
     handleOpen();
@@ -98,6 +109,7 @@ const Home = () => {
       });
     setLoading(false);
   };
+
   const body = (
     <form
       style={{
@@ -116,18 +128,27 @@ const Home = () => {
       <button style={{ display: "none" }}>Search</button>
     </form>
   );
+
   if (loading) return <h1>Finding Room..</h1>;
+
   return (
-    <div>
-      <h1>Home</h1>
-      <button onClick={findRoom}>Game Room</button>
-      <button onClick={createPrivateRoom}>Create Private Room</button>
-      <button onClick={handleOpen}>Find Private Room</button>
-      <Modal open={open} onClose={handleClose}>
-        {body}
-      </Modal>
-      <button onClick={logoutHandler}>Log Out</button>
-    </div>
+    <HomeContainer>
+      <HomeBox>
+        <HomeHead>Tic-Tac-Toe</HomeHead>
+        <HomeButtons>
+          <HomeButton onClick={findRoom}>Play Game</HomeButton>
+          <HomeButton onClick={createPrivateRoom}>
+            Create Private Room
+          </HomeButton>
+          <HomeButton onClick={handleOpen}>Find Private Room</HomeButton>
+          <HomeButton onClick={logoutHandler}>Log Out</HomeButton>
+        </HomeButtons>
+        <Modal open={open} onClose={handleClose}>
+          {body}
+        </Modal>
+      </HomeBox>
+      <Cover />
+    </HomeContainer>
   );
 };
 
