@@ -5,6 +5,7 @@ import { auth } from "./firebase";
 import { useStateValue } from "./StateProvider";
 const Home = lazy(() => import("./Pages/Home"));
 const Room = lazy(() => import("./Pages/Room"));
+const AiMatch = lazy(() => import("./Pages/AiMatch"));
 const Login = lazy(() => import("./Pages/Login"));
 
 function App() {
@@ -39,6 +40,7 @@ function App() {
         <Router>
           <Switch>
             <Suspense fallback={<h1>Loading...</h1>}>
+              <Route path="/room/ai" component={AiMatch} />
               <Route path="/room/:id" component={Room} />
               <Route exact path="/" component={Home} />
             </Suspense>

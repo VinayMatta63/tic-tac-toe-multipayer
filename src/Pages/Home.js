@@ -8,9 +8,10 @@ import {
   HomeButtons,
   Cover,
   HomeBox,
-  HomeHead,
+  // HomeHead,
   HomeButton,
 } from "../styles";
+import TextScroller from "../Components/Home/TextScroller.jsx";
 
 const Home = () => {
   const history = useHistory();
@@ -134,9 +135,13 @@ const Home = () => {
   return (
     <HomeContainer>
       <HomeBox>
-        <HomeHead>Tic-Tac-Toe</HomeHead>
+        <TextScroller text="Tic-Tac-Toe" />
         <HomeButtons>
           <HomeButton onClick={findRoom}>Play Game</HomeButton>
+          <HomeButton onClick={() => history.push("/room/ai")}>
+            Play with AI
+          </HomeButton>
+
           <HomeButton onClick={createPrivateRoom}>
             Create Private Room
           </HomeButton>

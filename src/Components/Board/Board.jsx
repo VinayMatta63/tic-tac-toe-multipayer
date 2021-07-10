@@ -4,6 +4,7 @@ import { db } from "../../firebase";
 import useRoom from "../../hooks/useRoom";
 import { BoardCover, Game, Row, Reset, Container } from "../../styles";
 import { useStateValue } from "../../StateProvider";
+
 const Board = () => {
   const { id } = useParams();
   const { processing, room } = useRoom(id);

@@ -60,7 +60,7 @@ export const HomeButtons = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
-  height: 28vh;
+  height: 35vh;
   align-items: center;
 `;
 
@@ -100,7 +100,7 @@ export const HomeHead = styled.h1`
   font-family: "Raleway";
   font-size: 5.5em;
   font-family: 400;
-  margin-bottom: 50px;
+  margin-bottom: 10px;
   width: 100vw;
   text-align: center;
   color: #ddd;
