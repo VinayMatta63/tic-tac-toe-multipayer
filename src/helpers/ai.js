@@ -72,9 +72,7 @@ function minimax(board, depth, isMax) {
       for (let j = 0; j < 3; j++) {
         if (board[i][j] === "") {
           board[i][j] = opponent;
-
           best = Math.min(best, minimax(board, depth + 1, !isMax));
-
           board[i][j] = "";
         }
       }
@@ -93,11 +91,8 @@ export default function findBestMove(board) {
     for (let j = 0; j < 3; j++) {
       if (board[i][j] === "") {
         board[i][j] = player;
-
         let moveVal = minimax(board, 0, false);
-
         board[i][j] = "";
-
         if (moveVal > bestVal) {
           bestMove.row = i;
           bestMove.col = j;

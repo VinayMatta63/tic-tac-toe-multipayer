@@ -40,7 +40,7 @@ function App() {
         <Router>
           <Switch>
             <Suspense fallback={<h1>Loading...</h1>}>
-              <Route path="/room/ai" component={AiMatch} />
+              <Route path="/ai" component={AiMatch} />
               <Route path="/room/:id" component={Room} />
               <Route exact path="/" component={Home} />
             </Suspense>

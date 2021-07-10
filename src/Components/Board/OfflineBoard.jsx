@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { BoardCover, Game, Row, Reset, Container } from "../../styles";
+import { useHistory } from "react-router-dom";
 import findBestMove from "../../helpers/ai.js";
 const OfflineBoard = () => {
-  //   const [loading, setLoading] = useState(false);
+  const history = useHistory();
   const [board, setBoard] = useState(["", "", "", "", "", "", "", "", ""]);
   const [gameDone, setGameDone] = useState(false);
   const [message, setMessage] = useState(null);
   const [turnCount, setTurnCount] = useState(0);
   const [playerTurn, setPlayerTurn] = useState("X");
   const [aiMove, setAiMove] = useState(null);
-
-  //   if (loading) return <h1>Resetting the Game...</h1>;
 
   useEffect(() => {
     if (playerTurn === "O") {
@@ -90,7 +89,9 @@ const OfflineBoard = () => {
     setAiMove(null);
     setTurnCount(null);
   };
-  const handleExit = () => {};
+  const handleExit = () => {
+    history.push("/");
+  };
   return (
     <BoardCover>
       <h1>Tic-Tac-Toe Room </h1>

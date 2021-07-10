@@ -138,7 +138,7 @@ const Home = () => {
         <TextScroller text="Tic-Tac-Toe" />
         <HomeButtons>
           <HomeButton onClick={findRoom}>Play Game</HomeButton>
-          <HomeButton onClick={() => history.push("/room/ai")}>
+          <HomeButton onClick={() => history.push("/ai")}>
             Play with AI
           </HomeButton>
 
