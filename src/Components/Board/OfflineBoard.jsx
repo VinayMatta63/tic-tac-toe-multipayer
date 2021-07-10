@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { BoardCover, Game, Row, Reset, Container } from "../../styles";
 import { useHistory } from "react-router-dom";
 import findBestMove from "../../helpers/ai.js";
+
 const OfflineBoard = () => {
   const history = useHistory();
   const [board, setBoard] = useState(["", "", "", "", "", "", "", "", ""]);
@@ -9,84 +10,72 @@ const OfflineBoard = () => {
   const [message, setMessage] = useState(null);
   const [turnCount, setTurnCount] = useState(0);
   const [playerTurn, setPlayerTurn] = useState("X");
-  const [aiMove, setAiMove] = useState(null);
 
-  useEffect(() => {
-    if (playerTurn === "O") {
-      const move = findBestMove([
-        board.slice(0, 3),
-        board.slice(3, 6),
-        board.slice(6, 9),
-      ]);
-      setAiMove(move.row * 3 + move.col);
-      // setAiMove();
+  const checkBoard = (newBoard) => {
+    if (
+      (newBoard[0] === newBoard[1] &&
+        newBoard[1] === newBoard[2] &&
+        newBoard[2] === playerTurn) ||
+      (newBoard[3] === newBoard[4] &&
+        newBoard[4] === newBoard[5] &&
+        newBoard[5] === playerTurn) ||
+      (newBoard[6] === newBoard[7] &&
+        newBoard[7] === newBoard[8] &&
+        newBoard[8] === playerTurn) ||
+      (newBoard[0] === newBoard[4] &&
+        newBoard[4] === newBoard[8] &&
+        newBoard[8] === playerTurn) ||
+      (newBoard[6] === newBoard[4] &&
+        newBoard[4] === newBoard[2] &&
+        newBoard[2] === playerTurn) ||
+      (newBoard[0] === newBoard[3] &&
+        newBoard[3] === newBoard[6] &&
+        newBoard[6] === playerTurn) ||
+      (newBoard[1] === newBoard[4] &&
+        newBoard[4] === newBoard[7] &&
+        newBoard[7] === playerTurn) ||
+      (newBoard[1] === newBoard[5] &&
+        newBoard[5] === newBoard[8] &&
+        newBoard[8] === playerTurn)
+    ) {
+      setMessage(playerTurn === "X" ? "Player Wins!!" : "AI Wins");
+      setGameDone(true);
     }
-  }, [board, playerTurn]);
-
+    if (turnCount === 8) {
+      setMessage("Draw");
+      setGameDone(true);
+    }
+  };
   const setSquare = (index) => {
     if (!board[index] && !gameDone) {
       const newBoard = [...board];
-      newBoard[index] = playerTurn;
+      newBoard[index] = "X";
+      setPlayerTurn("X");
       if (turnCount >= 4) {
-        if (playerTurn === "X") {
-          if (
-            (newBoard[0] === "X" &&
-              newBoard[1] === "X" &&
-              newBoard[2] === "X") ||
-            (newBoard[3] === "X" &&
-              newBoard[4] === "X" &&
-              newBoard[5] === "X") ||
-            (newBoard[6] === "X" &&
-              newBoard[7] === "X" &&
-              newBoard[8] === "X") ||
-            (newBoard[0] === "X" &&
-              newBoard[4] === "X" &&
-              newBoard[8] === "X") ||
-            (newBoard[6] === "X" && newBoard[4] === "X" && newBoard[2] === "X")
-          ) {
-            setMessage("Player Wins");
-            setGameDone(true);
-          }
-        } else {
-          if (
-            (newBoard[0] === "O" &&
-              newBoard[1] === "O" &&
-              newBoard[2] === "O") ||
-            (newBoard[3] === "O" &&
-              newBoard[4] === "O" &&
-              newBoard[5] === "O") ||
-            (newBoard[6] === "O" &&
-              newBoard[7] === "O" &&
-              newBoard[8] === "O") ||
-            (newBoard[0] === "O" &&
-              newBoard[4] === "O" &&
-              newBoard[8] === "O") ||
-            (newBoard[6] === "O" && newBoard[4] === "O" && newBoard[2] === "O")
-          ) {
-            setMessage("AI Wins");
-            setGameDone(true);
-          }
-        }
-        if (turnCount === 8) {
-          setMessage("Draw");
-          setGameDone(true);
-        }
+        checkBoard(newBoard);
       }
-      setTurnCount(turnCount + 1);
+      const move = findBestMove([
+        newBoard.slice(0, 3),
+        newBoard.slice(3, 6),
+        newBoard.slice(6, 9),
+      ]);
+      newBoard[move.row * 3 + move.col] = "O";
+      setPlayerTurn("O");
+
+      if (turnCount >= 4) {
+        checkBoard(newBoard);
+      }
+      setTurnCount(turnCount + 2);
+
       setBoard(newBoard);
-      setPlayerTurn(playerTurn === "X" ? "O" : "X");
     }
   };
-  useEffect(() => {
-    setSquare(aiMove);
-  }, [aiMove]);
 
   const handleReset = () => {
     setBoard(["", "", "", "", "", "", "", "", ""]);
     setGameDone(false);
     setMessage(null);
     setPlayerTurn("X");
-    setAiMove(null);
     setTurnCount(null);
   };
   const handleExit = () => {
@@ -95,28 +84,7 @@ const OfflineBoard = () => {
   return (
     <BoardCover>
       <h1>Tic-Tac-Toe Room </h1>
-      <h3>{message ? message : `Player Turn - ${playerTurn}`}</h3>
-      {playerTurn === "O" && !gameDone ? (
-        <h1
-          style={{
-            position: "absolute",
-            zIndex: 101,
-            marginTop: "-30px",
-            color: "white",
-            backgroundColor: "black",
-            opacity: 0.5,
-            height: "65vh",
-            width: "100%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          Waiting for other player's turn
-        </h1>
-      ) : (
-        ""
-      )}
+      <h3>{message ? message : `Player Vs AI`}</h3>
       <Game>
         <Row>
           <Container onClick={() => setSquare(0)}>{board[0]}</Container>

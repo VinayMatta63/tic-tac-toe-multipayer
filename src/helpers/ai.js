@@ -1,15 +1,10 @@
-class Move {
-  constructor() {
-    let row, col;
-  }
-}
-
-let player = "X",
-  opponent = "O";
+let player = "O",
+  opponent = "X";
 
 function isMovesLeft(board) {
   for (let i = 0; i < 3; i++)
     for (let j = 0; j < 3; j++) if (board[i][j] === "") return true;
+
   return false;
 }
 
@@ -40,7 +35,6 @@ function evaluate(b) {
 
   return 0;
 }
-
 function minimax(board, depth, isMax) {
   let score = evaluate(board);
 
@@ -57,9 +51,7 @@ function minimax(board, depth, isMax) {
       for (let j = 0; j < 3; j++) {
         if (board[i][j] === "") {
           board[i][j] = player;
-
           best = Math.max(best, minimax(board, depth + 1, !isMax));
-
           board[i][j] = "";
         }
       }
@@ -67,7 +59,6 @@ function minimax(board, depth, isMax) {
     return best;
   } else {
     let best = 1000;
-
     for (let i = 0; i < 3; i++) {
       for (let j = 0; j < 3; j++) {
         if (board[i][j] === "") {
@@ -83,10 +74,9 @@ function minimax(board, depth, isMax) {
 
 export default function findBestMove(board) {
   let bestVal = -1000;
-  let bestMove = new Move();
+  let bestMove = {};
   bestMove.row = -1;
   bestMove.col = -1;
-
   for (let i = 0; i < 3; i++) {
     for (let j = 0; j < 3; j++) {
       if (board[i][j] === "") {
