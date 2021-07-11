@@ -2,7 +2,14 @@ import React, { useState } from "react";
 import { useHistory, useParams } from "react-router";
 import { db } from "../../firebase";
 import useRoom from "../../hooks/useRoom";
-import { BoardCover, Game, Row, Reset, Container } from "../../styles";
+import {
+  BoardCover,
+  Game,
+  Row,
+  Reset,
+  Container,
+  BoardContainer,
+} from "../../styles";
 import { useStateValue } from "../../StateProvider";
 import Loader from "../Loading/Loader";
 
@@ -12,6 +19,8 @@ const Board = () => {
   const [{ user }] = useStateValue();
   const history = useHistory();
   const [loading, setLoading] = useState(false);
+  const [opponent, setOpponent] = useState(false);
+
   if (processing) return <Loader text="Loading Room..." />;
   if (!room) return <Loader text="Room Not Found..." />;
   if (loading) return <Loader text="Resetting The Game..." />;
@@ -25,6 +34,15 @@ const Board = () => {
     players,
     isPrivate,
   } = room;
+
+  const getOpponent = async () => {
+    return await db
+      .collection("users")
+      .doc(players.filter((player) => player !== user.id)[0])
+      .get()
+      .then((result) => setOpponent(result.data()));
+  };
+
   const sendBoard = async (id, newRoom) => {
     await db.collection("rooms").doc(id).set(newRoom);
   };
@@ -152,74 +170,91 @@ const Board = () => {
         });
     }
   };
+  getOpponent();
   return (
-    <BoardCover>
-      {players.length < 2 ? (
-        !isPrivate ? (
-          <Loader
-            text="Waiting For Someone To Join..."
-            handleExit={handleExit}
-            id={id}
-          />
-        ) : (
-          <Loader
-            text="Ask Your Friend To Join Using Given ID..."
-            id={id}
-            handleExit={handleExit}
-            isPrivate={true}
-          />
-        )
-      ) : (
-        <>
-          <h1>Tic-Tac-Toe Room</h1>
-          <h3>{message ? message : `Player Turn - ${playerTurn}`}</h3>
-          {(playerTurn === "X" && !(user.id === players[0]) && !gameDone) ||
-          (playerTurn === "O" && user.id === players[0] && !gameDone) ? (
-            <h1
-              style={{
-                position: "absolute",
-                zIndex: 101,
-                marginTop: "-30px",
-                color: "white",
-                backgroundColor: "black",
-                opacity: 0.5,
-                height: "65vh",
-                width: "100%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              Waiting for other player's turn
-            </h1>
-          ) : (
-            ""
-          )}
-          <Game>
-            <Row>
-              <Container onClick={() => setSquare(0)}>{board[0]}</Container>
-              <Container onClick={() => setSquare(1)}>{board[1]}</Container>
-              <Container onClick={() => setSquare(2)}>{board[2]}</Container>
-            </Row>
-            <Row>
-              <Container onClick={() => setSquare(3)}>{board[3]}</Container>
-              <Container onClick={() => setSquare(4)}>{board[4]}</Container>
-              <Container onClick={() => setSquare(5)}>{board[5]}</Container>
-            </Row>
-            <Row>
-              <Container onClick={() => setSquare(6)}>{board[6]}</Container>
-              <Container onClick={() => setSquare(7)}>{board[7]}</Container>
-              <Container onClick={() => setSquare(8)}>{board[8]}</Container>
-            </Row>
-          </Game>
-        </>
+    <BoardContainer>
+      {opponent && window.innerWidth > 767 && (
+        <BoardCover>
+          <img src={user.profile} alt="" />
+          <span style={{ marginTop: "10px" }}>{user.name}</span>
+        </BoardCover>
       )}
 
-      {gameDone && <Reset onClick={() => handleReset(id)}>Reset</Reset>}
-      {!(players.length < 2) && (
-        <Reset onClick={() => handleExit(id)}>Exit</Reset>
+      <BoardCover>
+        {players.length < 2 ? (
+          !isPrivate ? (
+            <Loader
+              text="Waiting For Someone To Join..."
+              handleExit={handleExit}
+              id={id}
+            />
+          ) : (
+            <Loader
+              text="Ask Your Friend To Join Using Given ID..."
+              id={id}
+              handleExit={handleExit}
+              isPrivate={true}
+            />
+          )
+        ) : (
+          <>
+            <h1>Tic-Tac-Toe Room</h1>
+            <h3>{message ? message : `Player Turn - ${playerTurn}`}</h3>
+            {(playerTurn === "X" && !(user.id === players[0]) && !gameDone) ||
+            (playerTurn === "O" && user.id === players[0] && !gameDone) ? (
+              <h1
+                style={{
+                  position: "absolute",
+                  zIndex: 101,
+                  marginTop: "-30px",
+                  color: "white",
+                  backgroundColor: "black",
+                  opacity: 0.5,
+                  height: "65vh",
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  textAlign: "center",
+                }}
+              >
+                Waiting for other player's turn
+              </h1>
+            ) : (
+              ""
+            )}
+            <Game small={window.innerWidth < 767}>
+              <Row>
+                <Container onClick={() => setSquare(0)}>{board[0]}</Container>
+                <Container onClick={() => setSquare(1)}>{board[1]}</Container>
+                <Container onClick={() => setSquare(2)}>{board[2]}</Container>
+              </Row>
+              <Row>
+                <Container onClick={() => setSquare(3)}>{board[3]}</Container>
+                <Container onClick={() => setSquare(4)}>{board[4]}</Container>
+                <Container onClick={() => setSquare(5)}>{board[5]}</Container>
+              </Row>
+              <Row>
+                <Container onClick={() => setSquare(6)}>{board[6]}</Container>
+                <Container onClick={() => setSquare(7)}>{board[7]}</Container>
+                <Container onClick={() => setSquare(8)}>{board[8]}</Container>
+              </Row>
+            </Game>
+          </>
+        )}
+
+        {gameDone && <Reset onClick={() => handleReset(id)}>Reset</Reset>}
+        {!(players.length < 2) && (
+          <Reset onClick={() => handleExit(id)}>Exit</Reset>
+        )}
+      </BoardCover>
+      {opponent && window.innerWidth > 767 && (
+        <BoardCover>
+          <img src={opponent.profile} alt="" />
+          <span style={{ marginTop: "10px" }}>{opponent.name}</span>
+        </BoardCover>
       )}
-    </BoardCover>
+    </BoardContainer>
   );
 };
 

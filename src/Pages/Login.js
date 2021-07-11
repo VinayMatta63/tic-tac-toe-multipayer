@@ -1,6 +1,6 @@
 import React from "react";
 import LoginComponent from "../Components/Login/index";
-import { auth, provider } from "../firebase";
+import { auth, db, provider } from "../firebase";
 import { useStateValue } from "../StateProvider";
 
 const Login = () => {
@@ -8,7 +8,7 @@ const Login = () => {
   const signIn = () => {
     auth
       .signInWithPopup(provider)
-      .then((result) => {
+      .then(async (result) => {
         dispatch({
           type: "SET_USER",
           user: {
@@ -18,6 +18,27 @@ const Login = () => {
             id: result.user.uid,
           },
         });
+        const users = await db
+          .collection("users")
+          .get()
+          .then((data) =>
+            data.docs.filter((doc) => doc.data().id === result.user.uid)
+          );
+        if (!users.length > 0)
+          await db
+            .collection("users")
+            .doc(result.uid)
+            .set(
+              Object.assign(
+                {},
+                {
+                  name: result.displayName || null,
+                  email: result.email || null,
+                  profile: result.photoURL || null,
+                  id: result.uid || null,
+                }
+              )
+            );
       })
       .catch((error) => alert(error.message));
   };

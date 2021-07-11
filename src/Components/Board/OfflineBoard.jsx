@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { BoardCover, Game, Row, Reset, Container } from "../../styles";
+import {
+  BoardCover,
+  Game,
+  Row,
+  Reset,
+  Container,
+  BoardContainer,
+} from "../../styles";
 import { useHistory } from "react-router-dom";
 import findBestMove from "../../helpers/ai.js";
 
@@ -82,30 +89,31 @@ const OfflineBoard = () => {
     history.push("/");
   };
   return (
-    <BoardCover>
-      <h1>Tic-Tac-Toe Room </h1>
-      <h3>{message ? message : `Player Vs AI`}</h3>
-      <Game>
-        <Row>
-          <Container onClick={() => setSquare(0)}>{board[0]}</Container>
-          <Container onClick={() => setSquare(1)}>{board[1]}</Container>
-          <Container onClick={() => setSquare(2)}>{board[2]}</Container>
-        </Row>
-        <Row>
-          <Container onClick={() => setSquare(3)}>{board[3]}</Container>
-          <Container onClick={() => setSquare(4)}>{board[4]}</Container>
-          <Container onClick={() => setSquare(5)}>{board[5]}</Container>
-        </Row>
-        <Row>
-          <Container onClick={() => setSquare(6)}>{board[6]}</Container>
-          <Container onClick={() => setSquare(7)}>{board[7]}</Container>
-          <Container onClick={() => setSquare(8)}>{board[8]}</Container>
-        </Row>
-      </Game>
-
-      {gameDone && <Reset onClick={() => handleReset()}>Reset</Reset>}
-      <Reset onClick={() => handleExit()}>Exit</Reset>
-    </BoardCover>
+    <BoardContainer>
+      <BoardCover>
+        <h1>Tic-Tac-Toe Room </h1>
+        <h3>{message ? message : `Player Vs AI`}</h3>
+        <Game small={window.innerWidth < 767}>
+          <Row>
+            <Container onClick={() => setSquare(0)}>{board[0]}</Container>
+            <Container onClick={() => setSquare(1)}>{board[1]}</Container>
+            <Container onClick={() => setSquare(2)}>{board[2]}</Container>
+          </Row>
+          <Row>
+            <Container onClick={() => setSquare(3)}>{board[3]}</Container>
+            <Container onClick={() => setSquare(4)}>{board[4]}</Container>
+            <Container onClick={() => setSquare(5)}>{board[5]}</Container>
+          </Row>
+          <Row>
+            <Container onClick={() => setSquare(6)}>{board[6]}</Container>
+            <Container onClick={() => setSquare(7)}>{board[7]}</Container>
+            <Container onClick={() => setSquare(8)}>{board[8]}</Container>
+          </Row>
+        </Game>
+        {gameDone && <Reset onClick={() => handleReset()}>Reset</Reset>}
+        <Reset onClick={() => handleExit()}>Exit</Reset>
+      </BoardCover>
+    </BoardContainer>
   );
 };
 

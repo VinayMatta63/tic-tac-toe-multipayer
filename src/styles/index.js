@@ -25,16 +25,26 @@ export const BoardCover = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
+  flex: 0.33;
+`;
+export const BoardCoverSmall = styled(BoardCover)`
+  flex-direction: row;
+`;
+export const BoardContainer = styled.div`
+  display: flex;
   width: 100vw;
   height: 100vh;
+  justify-content: space-evenly;
+  ${(props) => props.small && "flex-direction:column"}
 `;
-
 export const Game = styled.div`
   margin: auto;
   width: 60vh;
   height: 60vh;
   padding: 2px;
   border: 1px solid black;
+  ${(props) => props.small && "width:50vh"}
 `;
 
 export const Row = styled.div`
@@ -113,6 +123,7 @@ export const LoadContainer = styled.div`
   width: 100vw;
   height: 100vh;
   display: flex;
+  text-align: center;
   align-items: center;
   justify-content: center;
   flex-direction: column;
