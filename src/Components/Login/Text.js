@@ -7,6 +7,7 @@ export default function Text({
   vAlign = "center",
   hAlign = "center",
   size = 1.5,
+  fontSize,
   color = "#000000",
   ...props
 }) {
@@ -14,7 +15,7 @@ export default function Text({
   const config = useMemo(
     () => ({
       font,
-      size: 40,
+      size: fontSize,
       height: 30,
       curveSegments: 32,
       bevelEnabled: true,
@@ -23,7 +24,7 @@ export default function Text({
       bevelOffset: 0,
       bevelSegments: 8,
     }),
-    [font]
+    [font, fontSize]
   );
   const mesh = useRef();
   useLayoutEffect(() => {

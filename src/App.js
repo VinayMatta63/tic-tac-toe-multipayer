@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import React, { lazy, Suspense, useEffect } from "react";
 import { auth } from "./firebase";
 import { useStateValue } from "./StateProvider";
+import Loader from "./Components/Loading/Loader";
 const Home = lazy(() => import("./Pages/Home"));
 const Room = lazy(() => import("./Pages/Room"));
 const AiMatch = lazy(() => import("./Pages/AiMatch"));
@@ -33,13 +34,13 @@ function App() {
   return (
     <div className="App">
       {!user ? (
-        <Suspense fallback={<h1>Redirecting to Login ...</h1>}>
+        <Suspense fallback={<Loader text="Redirecting To Login..." />}>
           <Login />
         </Suspense>
       ) : (
         <Router>
           <Switch>
-            <Suspense fallback={<h1>Loading...</h1>}>
+            <Suspense fallback={<Loader text="Loading..." />}>
               <Route path="/ai" component={AiMatch} />
               <Route path="/room/:id" component={Room} />
               <Route exact path="/" component={Home} />

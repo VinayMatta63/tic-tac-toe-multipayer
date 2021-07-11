@@ -5,7 +5,6 @@ import Text from "./Text";
 import Sky from "./Sky";
 import { TextureLoader } from "three";
 import { HomeButton } from "../../styles";
-import { OrbitControls } from "@react-three/drei";
 function Jumbo() {
   const ref = useRef();
   useFrame(
@@ -17,9 +16,24 @@ function Jumbo() {
   );
   return (
     <group ref={ref}>
-      <Text hAlign="right" position={[-15, 15, 0]} children="TIC" />
-      <Text hAlign="right" position={[-15, -1, 0]} children="TAC" />
-      <Text hAlign="right" position={[-15, -12, 0]} children="TOE" />
+      <Text
+        hAlign="right"
+        position={window.innerWidth > 767 ? [-15, 15, 0] : [-8, 10, 0]}
+        children="TIC"
+        fontSize={window.innerWidth > 767 ? 40 : 20}
+      />
+      <Text
+        hAlign="right"
+        position={window.innerWidth > 767 ? [-15, -1, 0] : [-8, 0, 0]}
+        children="TAC"
+        fontSize={window.innerWidth > 767 ? 40 : 20}
+      />
+      <Text
+        hAlign="right"
+        position={window.innerWidth > 767 ? [-15, -12, 0] : [-12, -10, 0]}
+        children="TOE"
+        fontSize={window.innerWidth > 767 ? 40 : 20}
+      />
     </group>
   );
 }

@@ -34,7 +34,7 @@ const OfflineBoard = () => {
       (newBoard[1] === newBoard[4] &&
         newBoard[4] === newBoard[7] &&
         newBoard[7] === playerTurn) ||
-      (newBoard[1] === newBoard[5] &&
+      (newBoard[2] === newBoard[5] &&
         newBoard[5] === newBoard[8] &&
         newBoard[8] === playerTurn)
     ) {

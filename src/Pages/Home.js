@@ -8,14 +8,16 @@ import {
   HomeButtons,
   Cover,
   HomeBox,
-  // HomeHead,
+  Input,
   HomeButton,
 } from "../styles";
 import TextScroller from "../Components/Home/TextScroller.jsx";
+import Loader from "../Components/Loading/Loader";
 
 const Home = () => {
   const history = useHistory();
   const [loading, setLoading] = useState(false);
+  const [wrong, setWrong] = useState(false);
   const [{ user }, dispatch] = useStateValue();
   const [input, setInput] = useState();
   const [open, setOpen] = useState(false);
@@ -101,27 +103,34 @@ const Home = () => {
     handleOpen();
     setLoading(true);
     const room = await db.collection("rooms").doc(input).get();
-    await db
-      .collection("rooms")
-      .doc(input)
-      .update({ players: [...room.data().players, user.id] })
-      .then(() => {
-        history.push(`/room/${input}`);
-      });
+    if (!room.exists) setWrong(true);
+    else
+      await db
+        .collection("rooms")
+        .doc(input)
+        .update({ players: [...room.data().players, user.id] })
+        .then(() => {
+          history.push(`/room/${input}`);
+        });
     setLoading(false);
   };
 
   const body = (
     <form
       style={{
-        width: "60vh",
-        height: "60vh",
+        width: "max-content",
         margin: "auto",
-        backgroundColor: "white",
+        border: "none",
+        outline: "none",
+        padding: "20px",
+        borderRadius: "15px",
+        marginTop: "40vh",
+        background:
+          "radial-gradient(circle farthest-corner at center top,#071021,#19324a)",
       }}
       onSubmit={(e) => findPrivateRoom(e)}
     >
-      <input
+      <Input
         type="text"
         placeholder="Enter Room ID:"
         onChange={(e) => setInput(e.target.value)}
@@ -129,8 +138,19 @@ const Home = () => {
       <button style={{ display: "none" }}>Search</button>
     </form>
   );
-
-  if (loading) return <h1>Finding Room..</h1>;
+  const closeNotFound = () => {
+    setWrong(false);
+    handleClose();
+  };
+  if (loading) return <Loader text="Looking For A Room..." />;
+  if (wrong)
+    return (
+      <Loader
+        text="Room Does Not Exist..."
+        back={true}
+        closeNotFound={closeNotFound}
+      />
+    );
 
   return (
     <HomeContainer>

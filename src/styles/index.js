@@ -6,21 +6,18 @@ export const Container = styled.div`
   align-items: center;
   justify-content: center;
   margin: 2px;
-  background-color: lightgrey;
+  background-color: #46e891;
   cursor: pointer;
   transition: all 0.2s;
   color: white;
   font-size: 40px;
   font-weight: 500;
+
   :hover {
     transform: scale(1.03);
-    background-color: #fafafa;
+    background-color: #84fbbc;
     color: gray;
   }
-`;
-
-export const Reset = styled.button`
-  margin: auto;
 `;
 
 export const BoardCover = styled.div`
@@ -110,4 +107,33 @@ export const HomeHead = styled.h1`
 `;
 export const HomeBox = styled.div`
   z-index: 11;
+`;
+
+export const LoadContainer = styled.div`
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  background: radial-gradient(
+    circle farthest-corner at center top,
+    #071021,
+    #19324a
+  );
+`;
+
+export const LoadHead = styled.h1`
+  color: #fafafa;
+`;
+
+export const Reset = styled(HomeButton)`
+  margin: auto;
+`;
+
+export const Input = styled.input`
+  outline: none;
+  border: none;
+  padding: 10px 5px;
+  border-radius: 10px;
 `;

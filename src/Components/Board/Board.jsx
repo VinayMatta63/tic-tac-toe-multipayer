@@ -4,6 +4,7 @@ import { db } from "../../firebase";
 import useRoom from "../../hooks/useRoom";
 import { BoardCover, Game, Row, Reset, Container } from "../../styles";
 import { useStateValue } from "../../StateProvider";
+import Loader from "../Loading/Loader";
 
 const Board = () => {
   const { id } = useParams();
@@ -11,9 +12,9 @@ const Board = () => {
   const [{ user }] = useStateValue();
   const history = useHistory();
   const [loading, setLoading] = useState(false);
-  if (processing) return <h1>Loading Room...</h1>;
-  if (!room) return <h1>Room Not Found..</h1>;
-  if (loading) return <h1>Resetting the Game...</h1>;
+  if (processing) return <Loader text="Loading Room..." />;
+  if (!room) return <Loader text="Room Not Found..." />;
+  if (loading) return <Loader text="Resetting The Game..." />;
 
   const {
     board,
@@ -50,7 +51,18 @@ const Board = () => {
             (newBoard[0] === "X" &&
               newBoard[4] === "X" &&
               newBoard[8] === "X") ||
-            (newBoard[6] === "X" && newBoard[4] === "X" && newBoard[2] === "X")
+            (newBoard[6] === "X" &&
+              newBoard[4] === "X" &&
+              newBoard[2] === "X") ||
+            (newBoard[0] === newBoard[3] &&
+              newBoard[3] === newBoard[6] &&
+              newBoard[6] === "X") ||
+            (newBoard[1] === newBoard[4] &&
+              newBoard[4] === newBoard[7] &&
+              newBoard[7] === "X") ||
+            (newBoard[2] === newBoard[5] &&
+              newBoard[5] === newBoard[8] &&
+              newBoard[8] === "X")
           ) {
             newMessage = "X Wins!!";
             newGameDone = true;
@@ -69,7 +81,18 @@ const Board = () => {
             (newBoard[0] === "O" &&
               newBoard[4] === "O" &&
               newBoard[8] === "O") ||
-            (newBoard[6] === "O" && newBoard[4] === "O" && newBoard[2] === "O")
+            (newBoard[6] === "O" &&
+              newBoard[4] === "O" &&
+              newBoard[2] === "O") ||
+            (newBoard[0] === newBoard[3] &&
+              newBoard[3] === newBoard[6] &&
+              newBoard[6] === "O") ||
+            (newBoard[1] === newBoard[4] &&
+              newBoard[4] === newBoard[7] &&
+              newBoard[7] === "O") ||
+            (newBoard[2] === newBoard[5] &&
+              newBoard[5] === newBoard[8] &&
+              newBoard[8] === "O")
           ) {
             newMessage = "O Wins !!";
             newGameDone = true;
@@ -132,14 +155,23 @@ const Board = () => {
   return (
     <BoardCover>
       {players.length < 2 ? (
-        <h1>
-          {isPrivate
-            ? `Ask your friend to join using this id.. ${id}`
-            : "Looking for players... "}
-        </h1>
+        !isPrivate ? (
+          <Loader
+            text="Waiting For Someone To Join..."
+            handleExit={handleExit}
+            id={id}
+          />
+        ) : (
+          <Loader
+            text="Ask Your Friend To Join Using Given ID..."
+            id={id}
+            handleExit={handleExit}
+            isPrivate={true}
+          />
+        )
       ) : (
         <>
-          <h1>Tic-Tac-Toe Room {id}</h1>
+          <h1>Tic-Tac-Toe Room</h1>
           <h3>{message ? message : `Player Turn - ${playerTurn}`}</h3>
           {(playerTurn === "X" && !(user.id === players[0]) && !gameDone) ||
           (playerTurn === "O" && user.id === players[0] && !gameDone) ? (
@@ -184,7 +216,9 @@ const Board = () => {
       )}
 
       {gameDone && <Reset onClick={() => handleReset(id)}>Reset</Reset>}
-      <Reset onClick={() => handleExit(id)}>Exit</Reset>
+      {!(players.length < 2) && (
+        <Reset onClick={() => handleExit(id)}>Exit</Reset>
+      )}
     </BoardCover>
   );
 };
